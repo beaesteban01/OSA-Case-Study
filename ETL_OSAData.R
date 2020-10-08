@@ -95,19 +95,31 @@ length(unique(df_tmp1$Weight)) # 92 diff. values
 
 # FEATURES TRANSFORMATIONS
 
-# Drop Patient feature
-df_tmp1 <- subset(df_tmp1, select = -Patient)
-
 # Factor and numeric conversion 
+par(mfrow=c(1,2))
 df_tmp1$Gender = factor(df_tmp1$Gender)
+str(df_tmp1$Gender)
+barplot(table(df_tmp1$Gender))
 df_tmp1$Gender = as.numeric(df_tmp1$Gender)
+barplot(table(df_tmp1$Gender))
 
+par(mfrow=c(1,1))
+par(mfrow=c(1,2))
 df_tmp1$Smoker = factor(df_tmp1$Smoker)
+str(df_tmp1$Smoker)
+barplot(table(df_tmp1$Smoker))
 df_tmp1$Smoker = as.numeric(df_tmp1$Smoker)
+barplot(table(df_tmp1$Smoker))
 
-#plot(table(df_tmp1$Smoker))
+
+par(mfrow=c(1,1))
+par(mfrow=c(1,2))
+
 df_tmp1$Snorer = factor(df_tmp1$Snorer)
+summary(df_tmp1$Snorer)
+barplot(table(df_tmp1$Snorer))
 df_tmp1$Snorer= as.numeric(df_tmp1$Snorer)
+barplot(table(df_tmp1$Snorer))
 
 # Numeric conversion
 # String values replace with NA
@@ -125,6 +137,8 @@ vis_dat(df_tmp2)
 
 df_final <- df_tmp2 %>% drop_na()
 # %>% para aplicar una operacion sobre el df
+dfPru <- df_final
+
 
 vis_dat(df_final) 
 str(df_final) #REcompruebo que menos patient y gender es numeric
