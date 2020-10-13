@@ -174,12 +174,12 @@ summary(lm.fit)
 #MULTIPLE 1- weigh and cervical
 lm.fit1=lm(IAH~Weight+Cervical)
 summary(lm.fit1)
-plot(lm.fit1)
+plot(lm.fit1, main = 'Multiple Regression 1')
 
 #MULTIPLE 2- weigh and cervical and BMI
 lm.fit2=lm(IAH~Weight+Cervical+BMI)
 summary(lm.fit2)
-plot(lm.fit2)
+plot(lm.fit2, main = 'Multiple Regression 2')
 
 M <- cor(subset(df_OSA_feat2, select = -Patient))
 corrplot(M, method="number")
@@ -193,30 +193,22 @@ lm.fit3=lm(IAH~Weight+Height+Cervical+Age+Gender+BMI)
 # ver pptx ej pg 64
 
 summary(lm.fit3)
-plot(lm.fit3)
+plot(lm.fit3, main = 'Multiple Regression 3')
 
 #MULTIPLE 4  Todo - Gender
 lm.fit4=lm(IAH~Weight+Cervical+Height+Age +BMI)
 summary(lm.fit4)
-plot(lm.fit4)
+plot(lm.fit4, main = 'Multiple Regression 4')
 
 #MULTIPLE 5 todo - Gender -BMI
 lm.fit5=lm(IAH~Weight+Cervical+Height+Age)
 summary(lm.fit5)
-plot(lm.fit5)
-
-#MULTIPLE todo - Gener -heigh
-attach(df_OSA_feat2)
-M <- cor(subset(df_OSA_feat2, select = -Patient))
-lm.fit5=lm(IAH~Weight+Cervical+BMI+Age)
-summary(lm.fit5)
-plot(lm.fit5)
-
+plot(lm.fit5, main = 'Multiple Regression 5')
 
 #MULTIPLE 6 todo - bmi sin heigh and weight
 lm.fit6=lm(IAH~Cervical+BMI+Age)
 summary(lm.fit6)
-plot(lm.fit6)
+plot(lm.fit6, main = 'Multiple Regression 6')
 
 
 
