@@ -137,7 +137,6 @@ vis_dat(df_tmp2)
 
 df_final <- df_tmp2 %>% drop_na()
 # %>% para aplicar una operacion sobre el df
-dfPru <- df_final
 
 
 vis_dat(df_final) 

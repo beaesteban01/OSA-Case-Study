@@ -10,8 +10,36 @@ Data_Directory <- "/Users/beatrizesteban/OneDrive - Universidad Politécnica de
 
 # Using readxl package to read an Excel file
 # Install the readxl package is nor already installed
+library(readxl) # Using readxl package to read an Excel file
+library(naniar)
+# You can work with dplyr
+# for using select(df_tmp, Patient, Gender,...)
+# https://cran.r-project.org/web/packages/dplyr/vignettes/dplyr.html
+# dplyr's basic set of tools to apply on data frames
 
-library(readxl)
+library(dplyr) # asi importamos librerias --> tipo import en python
+#dplyr is a basic package for R tipo numpy, pandas etc para python
+#data.table libreria de R que se usa para trabajar con datasets muy grandes
+
+library(visdat) #visualize 
+# You can use tidyr
+# https://blog.rstudio.com/2014/07/22/introducing-tidyr/
+# tidyr is a package that makes it easy to "tidy" 
+# your data.
+#
+# Tidy data is data that's easy to work with:
+# it's easy to munge (with dplyr), visualise (with ggplot2 or ggvis) and model (with R's hundreds of modelling packages). The two most important properties of tidy data are:
+#
+# Each column is a variable.
+#
+# Each row is an observation.
+
+library(tidyr)
+# Write the clean data into Output_file
+# you can install writexl package
+
+library(writexl)
+
 
 df_OSA <- read_excel(paste(Data_Directory, Input_file, sep = ""))
 
@@ -20,16 +48,30 @@ names(df_OSA)
 dim(df_OSA)
 
 # COLORS
+library("RColorBrewer")
 color <- brewer.pal(7, "Set3") 
 greenDegradado <- brewer.pal(7, "Greens")
 
 
 # DISTRIBUTION HISTOGRAM
-hist(df_OSA$IAH) #poison distribution, why? to measure nº of time somt happens but in regression we supose that distributions are gaussian
+hist(df_OSA$IAH, main= 'IAH Histogram', xlab = "IAH", col= color) #poison distribution, why? to measure nº of time somt happens but in regression we supose that distributions are gaussian
 #solution--> coger el log (+1 por asegurar)
-hist(log(df_OSA$IAH+1), main= NULL, xlab = "IAH", col= color) #but why IAH is pisson distribution=? these type of question for data anaalysis
+hist(log(df_OSA$IAH+1), main= 'log(IAH+1) Histogram', xlab = "IAH", col= color) #but why IAH is pisson distribution=? these type of question for data anaalysis
 
-#hist(df_OSA$Weight)
+hist(df_OSA$Height, main= 'Height Histogram', xlab = "Height", col= color)
+hist(df_OSA$Weight, main= 'Weight Histogram', xlab = "Weight", col= color)
+hist(df_OSA$Cervical, main= 'Cervical Histogram', xlab = "Cervical", col= color)
+hist(df_OSA$Age, main= 'Age Histogram', xlab = "Age", col= color)
+hist(df_OSA_feat2$BMI, main= 'BMI Histogram', xlab = "BMI", col= color)
+par(mfrow=c(1,2))
+hist(df_OSA$Height[df_OSA$Gender==1], main= 'Male Height Histogram', xlab = "Height", col= color)
+hist(df_OSA$Height[df_OSA$Gender==2], main= 'Female Height Histogram', xlab = "Height", col= color)
+
+hist(df_OSA$IAH[df_OSA$Gender==1], main= 'Male IAH Histogram', xlab = "IAH", col= color)
+hist(df_OSA$IAH[df_OSA$Gender==2], main= 'Female IAH Histogram', xlab = "IAH", col= color)
+
+hist(log(df_OSA$IAH+1)[df_OSA$Gender==1], main= 'Male log(IAH+1) Histogram', xlab = "IAH", col= color)
+hist(log(df_OSA$IAH+1)[df_OSA$Gender==2], main= 'Female log(IAH+1) Histogram', xlab = "IAH", col= color)
 
 # typical: describe info --> groupby 
 # ej: vemos que hay mas male que female por lo que separar en estos grupos es relevante
@@ -65,7 +107,7 @@ M <- cor(subset(df_OSA_C, select = -Patient))
 corrplot(M, method="number")
 corrplot(M, method="circle", col=greenDegradado, tl.col = "black")
 
-
+par(mfrow=c(1,1))
 # SIMPLE Regression
 lm.fit= lm(IAH ~ Cervical)
 plot(Cervical, IAH)
@@ -82,6 +124,11 @@ plot(IAH, Weight)
 abline(lm.fit)
 summary(lm.fit)
 
+lm.fit= lm(IAH ~ Age)
+plot(Age, IAH)
+abline(lm.fit)
+summary(lm.fit)
+
 
 #residuals: comapration of predicted and true values (???)
 # coeffs: intercep = b1 and cervical = b0 
@@ -94,16 +141,16 @@ summary(lm.fit)
 # witgh and cervical are very correlated (ver en alguna matrix que no me ha salido) -->
 # some parameters are more important than others
 
-lm.fit=lm(IAH~Weight+Height+Cervical+Age+Gender)
-# think what happends qehn adding a categorical variable (gender) --> algo mal 
-# ver pptx ej pg 64
-#plot(IAH~Weight+Height+Cervical+Age+Gender+BMI)
-summary(lm.fit)
-
-# make predictions
-predIAH <- predict(lm.fit, df_OSA[c('Weight', 'Height', 'Cervical', 'Age', 'Gender')]) 
-#predIAH <- predict(lm.fit, df_OSA_C[c('Weight', 'Height', 'Cervical', 'Age', 'Gender', 'BMI')]) 
-plot(IAH, predIAH)
+# lm.fit=lm(IAH~Weight+Height+Cervical+Age+Gender)
+# # think what happends qehn adding a categorical variable (gender) --> algo mal 
+# # ver pptx ej pg 64
+# #plot(IAH~Weight+Height+Cervical+Age+Gender+BMI)
+# summary(lm.fit)
+# 
+# # make predictions
+# predIAH <- predict(lm.fit, df_OSA[c('Weight', 'Height', 'Cervical', 'Age', 'Gender')]) 
+# #predIAH <- predict(lm.fit, df_OSA_C[c('Weight', 'Height', 'Cervical', 'Age', 'Gender', 'BMI')]) 
+# plot(IAH, predIAH)
 
 
 # FEATURE ENGINEERING
@@ -112,7 +159,7 @@ plot(IAH, predIAH)
 df_OSA_feat1 <- select(df_OSA_C,- Smoker, -Snorer)
 str(df_OSA_feat1)
 # Creation of new column
-df_OSA_feat2 <- mutate(df_OSA_C, BMI = ((Weight)/(Height*10^-2)^2))
+df_OSA_feat2 <- mutate(df_OSA_feat1, BMI = ((Weight)/(Height*10^-2)^2))
 str(df_OSA_feat2)
 
 attach(df_OSA_feat2)
@@ -124,18 +171,57 @@ plot(IAH, BMI)
 abline(lm.fit)
 summary(lm.fit)
 
+#MULTIPLE 1- weigh and cervical
+lm.fit1=lm(IAH~Weight+Cervical)
+summary(lm.fit1)
+plot(lm.fit1)
 
-# MULTIPLE: more than cervical and iah
+#MULTIPLE 2- weigh and cervical and BMI
+lm.fit2=lm(IAH~Weight+Cervical+BMI)
+summary(lm.fit2)
+plot(lm.fit2)
+
+M <- cor(subset(df_OSA_feat2, select = -Patient))
+corrplot(M, method="number")
+
+# MULTIPLE 3 - todo
 # witgh and cervical are very correlated (ver en alguna matrix que no me ha salido) -->
 # some parameters are more important than others
 
-lm.fit=lm(IAH~Weight+Height+Cervical+Age+Gender+BMI)
+lm.fit3=lm(IAH~Weight+Height+Cervical+Age+Gender+BMI)
 # think what happends qehn adding a categorical variable (gender) --> algo mal 
 # ver pptx ej pg 64
-#plot(IAH~Weight+Height+Cervical+Age+Gender+BMI)
-summary(lm.fit)
 
-# make predictions
+summary(lm.fit3)
+plot(lm.fit3)
+
+#MULTIPLE 4  Todo - Gender
+lm.fit4=lm(IAH~Weight+Cervical+Height+Age +BMI)
+summary(lm.fit4)
+plot(lm.fit4)
+
+#MULTIPLE 5 todo - Gender -BMI
+lm.fit5=lm(IAH~Weight+Cervical+Height+Age)
+summary(lm.fit5)
+plot(lm.fit5)
+
+#MULTIPLE todo - Gener -heigh
+attach(df_OSA_feat2)
+M <- cor(subset(df_OSA_feat2, select = -Patient))
+lm.fit5=lm(IAH~Weight+Cervical+BMI+Age)
+summary(lm.fit5)
+plot(lm.fit5)
+
+
+#MULTIPLE 6 todo - bmi sin heigh and weight
+lm.fit6=lm(IAH~Cervical+BMI+Age)
+summary(lm.fit6)
+plot(lm.fit6)
+
+
+
+
+# PREDICTIONS
 predIAH <- predict(lm.fit, df_OSA_feat2[c('Weight', 'Height', 'Cervical', 'Age', 'Gender', 'BMI')]) 
 plot(IAH, predIAH, ylab = 'Predicted IAH')
 
