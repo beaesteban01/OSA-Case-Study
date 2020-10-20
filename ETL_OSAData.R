@@ -9,35 +9,20 @@ rm(list=ls())
 
 
 library(readxl) # Using readxl package to read an Excel file
-library(naniar)
-# You can work with dplyr
-# for using select(df_tmp, Patient, Gender,...)
-# https://cran.r-project.org/web/packages/dplyr/vignettes/dplyr.html
-# dplyr's basic set of tools to apply on data frames
+library(writexl) # write excelfile
 
-library(dplyr) # asi importamos librerias --> tipo import en python
-#dplyr is a basic package for R tipo numpy, pandas etc para python
-#data.table libreria de R que se usa para trabajar con datasets muy grandes
+library(dplyr) # To work with datasets, basic library
+library(tidyr) # easy to clean the daata an dowrk with. Each column is a variable and each row and obs
 
 library(visdat) #visualize 
-# You can use tidyr
-# https://blog.rstudio.com/2014/07/22/introducing-tidyr/
-# tidyr is a package that makes it easy to "tidy" 
-# your data.
-#
-# Tidy data is data that's easy to work with:
-# it's easy to munge (with dplyr), visualise (with ggplot2 or ggvis) and model (with R's hundreds of modelling packages). The two most important properties of tidy data are:
-#
-# Each column is a variable.
-#
-# Each row is an observation.
+library("RColorBrewer") #For colors
 
-library(tidyr)
+library(naniar) # for missing data
 # Write the clean data into Output_file
 # you can install writexl package
 
-library(writexl)
-library("RColorBrewer") #For colors
+
+
 
 Input_file <- "Info_BDApnea_QuironMalaga.xlsx"
 Output_file <- "OSA_DB_UPM.xlsx"
@@ -63,13 +48,15 @@ class(df_tmp)
 # to work with:
 # Patient, Gender, IAH, Peso, Talla, Edad, PerCervical
 
-df_tmp1 <- select(df_tmp, Patient, Gender, IAH, Peso, Talla, Edad, PerCervical, Fumador, Roncador)
+
+df_tmp1 <- select(df_tmp, Patient, Gender, IAH, Peso, Talla, Edad, PerCervical, Fumador, Roncador, Enfermedades)
 df_tmp1 <- df_tmp1 %>% rename(Weight = Peso,
                                 Height = Talla,
                                 Age = Edad,
                                 Cervical = PerCervical, 
                                 Smoker = Fumador, 
-                                Snorer = Roncador)
+                                Snorer = Roncador, 
+                                Illness = Enfermedades)
 
 # EXPLORATORY DATA ANALYSIS
 # See what kind of data we have in the df
@@ -79,13 +66,20 @@ str(df_tmp1)
 color <- brewer.pal(7, "Set3") 
 #length nos da el value contando los NA, en realidad es -1 de eso 
 
+
+barplot(table(df_tmp1$Illness), ylim = c(0,550), main= "Illness", col=color)
+length(unique(df_tmp1$Illness)) # 247 diff. values
+
 length(unique(df_tmp1$Gender)) # 2 diff. values
+count(df_tmp1,df_tmp1$Gender)
 barplot(table(df_tmp1$Gender), ylim = c(0,550), main= "Genders", col=color)
 
 length(unique(df_tmp1$Smoker)) # 6 diff. values
+count(df_tmp1,df_tmp1$Smoker)
 barplot(table(df_tmp1$Smoker), ylim = c(0,550),main= "Smokers", col=color)
 
 length(unique(df_tmp1$Snorer)) # 8 diff. values
+count(df_tmp1,df_tmp1$Snorer)
 barplot(table(df_tmp1$Snorer), ylim = c(0,550),main= "Snorer", col=color)
 
 length(unique(df_tmp1$Patient)) # 684 diff. values
@@ -94,6 +88,10 @@ length(unique(df_tmp1$Weight)) # 92 diff. values
 
 
 # FEATURES TRANSFORMATIONS
+
+# Transformation of illness into si-no
+df_tmp1$Illness[which(df_tmp1$Illness != "no")] <- "si"
+count(df_tmp1,df_tmp1$Illness)
 
 # Factor and numeric conversion 
 par(mfrow=c(1,2))
@@ -111,6 +109,13 @@ barplot(table(df_tmp1$Smoker))
 df_tmp1$Smoker = as.numeric(df_tmp1$Smoker)
 barplot(table(df_tmp1$Smoker))
 
+par(mfrow=c(1,1))
+par(mfrow=c(1,2))
+df_tmp1$Illness = factor(df_tmp1$Illness)
+str(df_tmp1$Illness)
+barplot(table(df_tmp1$Illness))
+df_tmp1$Illness = as.numeric(df_tmp1$Illness)
+barplot(table(df_tmp1$Illness))
 
 par(mfrow=c(1,1))
 par(mfrow=c(1,2))

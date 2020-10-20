@@ -14,7 +14,7 @@ rm(list=ls())
 
 Input_file <- "OSA_extreme_male.xlsx"
 
-Data_Directory <- "D:\\OSA_CaseStudy\\DATA\\"
+Data_Directory <- "/Users/beatrizesteban/OneDrive - Universidad Politécnica de Madrid/Segundo MUIT/PRDL&MLLB/OSA/DATA/"
 
 # Using readxl package to read an Excel file
 # Install the readxl package is nor already installed

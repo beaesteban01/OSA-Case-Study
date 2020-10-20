@@ -3,43 +3,28 @@
 #         - linear regression models
 #
 
+# Clear the working space
+rm(list=ls())
+
+
+library(readxl) # Using readxl package to read an Excel file
+library(writexl) # write excelfile
+
+library(dplyr) # To work with datasets, basic library
+library(tidyr) # easy to clean the daata an dowrk with. Each column is a variable and each row and obs
+
+library(visdat) #visualize 
+library("RColorBrewer") #For colors
+
+library(naniar) # for missing data
+# Write the clean data into Output_file
+# you can install writexl package
+library(corrplot) # correlation plots
+
+#Input_file <- "Info_BDApnea_QuironMalaga.xlsx"
 Input_file <- "OSA_DB_UPM.xlsx"
 
 Data_Directory <- "/Users/beatrizesteban/OneDrive - Universidad Politécnica de Madrid/Segundo MUIT/PRDL&MLLB/OSA/DATA/"
-
-
-# Using readxl package to read an Excel file
-# Install the readxl package is nor already installed
-library(readxl) # Using readxl package to read an Excel file
-library(naniar)
-# You can work with dplyr
-# for using select(df_tmp, Patient, Gender,...)
-# https://cran.r-project.org/web/packages/dplyr/vignettes/dplyr.html
-# dplyr's basic set of tools to apply on data frames
-
-library(dplyr) # asi importamos librerias --> tipo import en python
-#dplyr is a basic package for R tipo numpy, pandas etc para python
-#data.table libreria de R que se usa para trabajar con datasets muy grandes
-
-library(visdat) #visualize 
-# You can use tidyr
-# https://blog.rstudio.com/2014/07/22/introducing-tidyr/
-# tidyr is a package that makes it easy to "tidy" 
-# your data.
-#
-# Tidy data is data that's easy to work with:
-# it's easy to munge (with dplyr), visualise (with ggplot2 or ggvis) and model (with R's hundreds of modelling packages). The two most important properties of tidy data are:
-#
-# Each column is a variable.
-#
-# Each row is an observation.
-
-library(tidyr)
-# Write the clean data into Output_file
-# you can install writexl package
-
-library(writexl)
-
 
 df_OSA <- read_excel(paste(Data_Directory, Input_file, sep = ""))
 
@@ -48,7 +33,6 @@ names(df_OSA)
 dim(df_OSA)
 
 # COLORS
-library("RColorBrewer")
 color <- brewer.pal(7, "Set3") 
 greenDegradado <- brewer.pal(7, "Greens")
 
@@ -63,6 +47,7 @@ hist(df_OSA$Weight, main= 'Weight Histogram', xlab = "Weight", col= color)
 hist(df_OSA$Cervical, main= 'Cervical Histogram', xlab = "Cervical", col= color)
 hist(df_OSA$Age, main= 'Age Histogram', xlab = "Age", col= color)
 hist(df_OSA_feat2$BMI, main= 'BMI Histogram', xlab = "BMI", col= color)
+#hist(df_OSA$Illness, main= 'Illness Histogram', xlab = "Illness", col= color)
 par(mfrow=c(1,2))
 hist(df_OSA$Height[df_OSA$Gender==1], main= 'Male Height Histogram', xlab = "Height", col= color)
 hist(df_OSA$Height[df_OSA$Gender==2], main= 'Female Height Histogram', xlab = "Height", col= color)
@@ -72,6 +57,9 @@ hist(df_OSA$IAH[df_OSA$Gender==2], main= 'Female IAH Histogram', xlab = "IAH", c
 
 hist(log(df_OSA$IAH+1)[df_OSA$Gender==1], main= 'Male log(IAH+1) Histogram', xlab = "IAH", col= color)
 hist(log(df_OSA$IAH+1)[df_OSA$Gender==2], main= 'Female log(IAH+1) Histogram', xlab = "IAH", col= color)
+
+hist(log(df_OSA$IAH+1)[df_OSA$Illness==1], main= 'No Illness vs IAH Histogram', xlab = "IAH", col= color)
+hist(log(df_OSA$IAH+1)[df_OSA$Illness==2], main= 'Illness vs IAH Histogram', xlab = "IAH", col= color)
 
 # typical: describe info --> groupby 
 # ej: vemos que hay mas male que female por lo que separar en estos grupos es relevante
@@ -89,13 +77,13 @@ hist(log(df_OSA$IAH+1)[df_OSA$Gender==2], main= 'Female log(IAH+1) Histogram', x
 
 # See relations between variables
 attach(df_OSA)
-pairs(~ IAH + Gender + Weight + Height + Cervical + Age + Smoker + Snorer)
+pairs(~ IAH + Gender + Weight + Height + Cervical + Age + Smoker + Snorer+Illness)
 
 ## PLOT Correlation Matrix
 
 # FIRST
 # install corrplot and then load it
-library(corrplot)
+
 # back to as.numeric for including it..
 
 df_OSA_C=df_OSA
