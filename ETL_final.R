@@ -1,8 +1,6 @@
 ########################################
-# OSA Use Case
-#
-# Simple ETL process on a single Excel file
-#
+# Definition of final dataset 
+# after EDA
 
 # Clear the working space
 rm(list=ls())
@@ -25,7 +23,7 @@ library(naniar) # for missing data
 
 
 Input_file <- "Info_BDApnea_QuironMalaga.xlsx"
-Output_file <- "OSA_DB_UPM.xlsx"
+Output_file <- "OSA_DB_final.xlsx"
 
 Data_Directory <- "/Users/beatrizesteban/OneDrive - Universidad Politécnica de Madrid/Segundo MUIT/PRDL&MLLB/OSA/DATA/"
 
@@ -51,91 +49,44 @@ class(df_tmp)
 
 df_tmp1 <- select(df_tmp, Patient, Gender, IAH, Peso, Talla, Edad, PerCervical, Fumador, Roncador, Enfermedades)
 df_tmp1 <- df_tmp1 %>% rename(Weight = Peso,
-                                Height = Talla,
-                                Age = Edad,
-                                Cervical = PerCervical, 
-                                Smoker = Fumador, 
-                                Snorer = Roncador, 
-                                Illness = Enfermedades)
-
-# EXPLORATORY DATA ANALYSIS
-# See what kind of data we have in the df
-vis_dat(df_tmp1) 
-str(df_tmp1)
-
-color <- brewer.pal(7, "Set3") 
-#length nos da el value contando los NA, en realidad es -1 de eso 
-
-
-barplot(table(df_tmp1$Illness), ylim = c(0,550), main= "Illness", col=color)
-length(unique(df_tmp1$Illness)) # 247 diff. values
-
-length(unique(df_tmp1$Gender)) # 2 diff. values
-count(df_tmp1,df_tmp1$Gender)
-barplot(table(df_tmp1$Gender), ylim = c(0,550), main= "Genders", col=color)
-
-length(unique(df_tmp1$Smoker)) # 6 diff. values
-count(df_tmp1,df_tmp1$Smoker)
-barplot(table(df_tmp1$Smoker), ylim = c(0,550),main= "Smokers", col=color)
-
-length(unique(df_tmp1$Snorer)) # 8 diff. values
-count(df_tmp1,df_tmp1$Snorer)
-barplot(table(df_tmp1$Snorer), ylim = c(0,550),main= "Snorer", col=color)
-
-length(unique(df_tmp1$Patient)) # 684 diff. values
-length(unique(df_tmp1$Weight)) # 92 diff. values
-
-
+                              Height = Talla,
+                              Age = Edad,
+                              Cervical = PerCervical, 
+                              Smoker = Fumador, 
+                              Snorer = Roncador, 
+                              Illness = Enfermedades)
 
 # FEATURES TRANSFORMATIONS
 
 # Transformation of illness into si-no
 df_tmp1$Illness[which(df_tmp1$Illness != "no")] <- "si"
-count(df_tmp1,df_tmp1$Illness)
+
+# Delete Snorer and Smoker
+df_tmp1 <- select(df_tmp1, - Smoker, - Snorer)
+
+# Add BMI column
+df_tmp1$BMI <- with(df_tmp1, Weight / (Height/100.0)^2)
 
 # Factor and numeric conversion 
-par(mfrow=c(1,2))
+
 df_tmp1$Gender = factor(df_tmp1$Gender)
-str(df_tmp1$Gender)
-barplot(table(df_tmp1$Gender))
 df_tmp1$Gender = as.numeric(df_tmp1$Gender)
-barplot(table(df_tmp1$Gender))
 
-par(mfrow=c(1,1))
-par(mfrow=c(1,2))
 df_tmp1$Smoker = factor(df_tmp1$Smoker)
-str(df_tmp1$Smoker)
-barplot(table(df_tmp1$Smoker))
 df_tmp1$Smoker = as.numeric(df_tmp1$Smoker)
-barplot(table(df_tmp1$Smoker))
 
-par(mfrow=c(1,1))
-par(mfrow=c(1,2))
 df_tmp1$Illness = factor(df_tmp1$Illness)
-str(df_tmp1$Illness)
-barplot(table(df_tmp1$Illness))
 df_tmp1$Illness = as.numeric(df_tmp1$Illness)
-barplot(table(df_tmp1$Illness))
-
-par(mfrow=c(1,1))
-par(mfrow=c(1,2))
 
 df_tmp1$Snorer = factor(df_tmp1$Snorer)
-summary(df_tmp1$Snorer)
-barplot(table(df_tmp1$Snorer))
 df_tmp1$Snorer= as.numeric(df_tmp1$Snorer)
-barplot(table(df_tmp1$Snorer))
 
 # Numeric conversion
 # String values replace with NA
 df_tmp1$Weight = as.numeric(df_tmp1$Weight)
 
-vis_dat(df_tmp1)
-
 # Now change -1 values for NA in all columns (i.e. variables)
 df_tmp2 <- replace_with_na_all(df_tmp1,condition = ~.x == -1)
-
-vis_dat(df_tmp2)
 
 # Finally remove (drop out) all rows containing a NA
 # at least one column

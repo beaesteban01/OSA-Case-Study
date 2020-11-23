@@ -20,6 +20,10 @@ Data_Directory <- "/Users/beatrizesteban/OneDrive - Universidad Politécnica de
 # Install the readxl package is nor already installed
 
 library(readxl)
+library("RColorBrewer") #For colors
+color <- brewer.pal(7, "Set3") 
+greenDegradado <- brewer.pal(7, "Greens")
+
 
 df_OSA_male <- read_excel(paste(Data_Directory, Input_file, sep = ""))
 
@@ -32,30 +36,36 @@ df_OSA_male$OSA = factor(df_OSA_male$OSA)
 ########################################################
 ### For example: the correlation among predictors and IAH
 
-cor(df_OSA_male[,3:7])
+cor(df_OSA_male[,3:10]) #makes correlation from column 3 to 8
 
 # for examle a visualization
 library(corrplot)
 
-correlations = cor(df_OSA_male[,3:7])
+correlations = cor(df_OSA_male[,3:10])
 corrplot(correlations, method="number")
+corrplot(correlations, method="circle", col = greenDegradado, tl.col = "black")
 
 
 ############################################
 #### you can use ggplot2 for plotting
 #### histograms of a dataframe by group
 
-# set the plotting area into a 1*2 array
+# Mejor hacerlo con ggplot2
 par(mfrow=c(1,2))
 
-hist(subset(df_OSA_male, OSA=="Healthy")$IAH)
-hist(subset(df_OSA_male, OSA=="Severe")$IAH)
+hist(subset(df_OSA_male, OSA=="Healthy")$IAH, main= 'Healthy (low OSA) male histogram', xlab = "IAH", col = color)
+#hist(df_OSA_male$IAH[df_OSA_male$OSA=="Healthy"]) # es lo mismo que el anterior
+hist(subset(df_OSA_male, OSA=="Severe")$IAH, main= 'Ill (severe OSA) male histogram', xlab = "IAH", col = color)
 
 # set the plotting area into a 1*2 array
 par(mfrow=c(1,2))
+hist(subset(df_OSA_male, OSA=="Healthy")$Cervical, main= 'Healthy (low OSA) male histogram', xlab = "Cervical", col = color)
+hist(subset(df_OSA_male, OSA=="Severe")$Cervical, main= 'Ill (severe OSA) male histogram', xlab = "Cervical", col = color)
 
-hist(subset(df_OSA_male, OSA=="Healthy")$Cervical)
-hist(subset(df_OSA_male, OSA=="Severe")$Cervical)
+par(mfrow=c(1,2))
+hist(subset(df_OSA_male, OSA=="Healthy")$Weight, main= 'Healthy (low OSA) male histogram', xlab = "Weight", col = color)
+hist(subset(df_OSA_male, OSA=="Severe")$Weight, main= 'Ill (severe OSA) male histogram', xlab = "Weight", col = color)
+
 
 
 
@@ -88,8 +98,16 @@ xyplot(BMI ~ Age ,
 ###       R packages dedicated to data visualization
 
 library(ggplot2)
+library(gridExtra) #create a grid of plots (like subplot())
 
-ggplot(df_OSA_male, aes(x = BMI)) +
+p3 <- ggplot(df_OSA_male, aes(x = IAH)) +
+  geom_histogram(aes(color = OSA), fill = "white",
+                 position = "identity", bins = 30, alpha = 0.1) +
+  scale_color_manual(values = c("#00AF00", "#E7B800")) +
+  scale_fill_manual(values = c("#00AF00", "#E7B800"))
+
+
+p4 <- ggplot(df_OSA_male, aes(x = Cervical)) +
   geom_histogram(aes(color = OSA), fill = "white",
                  position = "identity", bins = 30, alpha = 0.1) +
   scale_color_manual(values = c("#00AF00", "#E7B800")) +
@@ -103,14 +121,14 @@ p1 <- ggplot(df_OSA_male, aes(x = BMI)) +
   scale_color_manual(values = c("#00AF00", "#E7B800")) +
   scale_fill_manual(values = c("#00AF00", "#E7B800"))
 
-p2 <- ggplot(df_OSA_male, aes(x = Height)) +
+p2 <- ggplot(df_OSA_male, aes(x = Weight)) +
   geom_histogram(aes(color = OSA), fill = "white",
                  position = "identity", bins = 30, alpha = 0.1) +
   scale_color_manual(values = c("#00AF00", "#E7B800")) +
   scale_fill_manual(values = c("#00AF00", "#E7B800"))
 
-library(gridExtra)
 grid.arrange(p1, p2, ncol = 2)
+grid.arrange(p3, p4, ncol = 2)
 
 
 ### ... you can also use boxplots "by group"
@@ -119,6 +137,7 @@ par(mfrow=c(1,2))
 attach(df_OSA_male)
 boxplot(BMI ~ OSA)
 boxplot(Height ~ OSA)
+boxplot(Cervical ~ OSA)
 
 #### To have QUANTITATIVE information you can 
 ####    use some tests on the:
@@ -140,8 +159,9 @@ boxplot(Height ~ OSA)
 # populations. To test the hypothesis, 
 
 kruskal.test(BMI ~ OSA, data = df_OSA_male) 
+kruskal.test(Cervical ~ OSA, data = df_OSA_male) 
 
-kruskal.test(Height ~ OSA, data = df_OSA_male)
+kruskal.test(Height + Weight ~ OSA, data = df_OSA_male)
 
 #### Please, understand and USE these or other tools
 #### like this and

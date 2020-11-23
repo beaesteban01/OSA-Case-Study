@@ -208,7 +208,7 @@ plot(IAH, predIAH, ylab = 'Predicted IAH')
 plot(predict(lm.fit),residuals(lm.fit),xlab='Fitted values',ylab='Residuals')
 
 
-
+###  NO HECHO
 # Study independently male and female populations: SUGGESTION
 
 ### Male population

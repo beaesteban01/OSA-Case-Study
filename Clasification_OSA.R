@@ -12,7 +12,7 @@ rm(list=ls())
 
 Input_file <- "OSA_extreme_male.xlsx"
 
-Data_Directory <- "D:\\OSA_CaseStudy\\DATA\\"
+Data_Directory <- "/Users/beatrizesteban/OneDrive - Universidad PoliteÌcnica de Madrid/Segundo MUIT/PRDL&MLLB/OSA/DATA/
 
 # Using readxl package to read an Excel file
 # Install the readxl package is nor already installed
@@ -290,7 +290,7 @@ ggplot(lift_obj$data) +
 #   For example:  k= 3,5,7,...15  (expand.grid creates a data frame)
 k_values <- expand.grid(k = seq(3, 15, 2)) 
 
-# Train control CV k´fold=10
+# Train control CV k?fold=10
 train_control <- trainControl(method='cv',
                         number = 10)
 

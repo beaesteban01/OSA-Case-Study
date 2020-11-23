@@ -26,7 +26,7 @@ dim(df_OSA)
 
 ## We will begin considering male subjets
 ### Male population
-df_OSA_male=subset(df_OSA, Gender=="hombre")
+df_OSA_male=subset(df_OSA, Gender==1)
 
 
 ########################################
