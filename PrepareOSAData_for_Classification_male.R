@@ -80,6 +80,6 @@ library(writexl)
 write_xlsx(df_OSA,
            paste(Data_Directory, Output_file, sep = ""))
 #guardo el de 2 clases
-write_xlsx(df_OSA,
+write_xlsx(df_OSA_bin,
            paste(Data_Directory, Output_file_bin, sep = ""))
 
